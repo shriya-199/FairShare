@@ -5,6 +5,8 @@ const prisma = new PrismaClient();
 
 async function main() {
   const passwordHash = await bcrypt.hash("Password123", 10);
+  await prisma.group.deleteMany({ where: { name: "Weekend Trip" } });
+
   const users = await Promise.all(
     [
       { name: "Ava Student", email: "ava@example.com" },
@@ -35,12 +37,22 @@ async function main() {
       groupId: group.id,
       description: "Cab from airport",
       amountCents: 4500,
+      originalAmountMinor: 4500,
+      originalCurrency: "INR",
+      normalizedAmountInrCents: 4500,
+      currencyCode: "INR",
       paidById: users[0].id,
       splitMethod: SplitMethod.EQUAL,
       expenseDate: new Date(),
       createdById: users[0].id,
       splits: {
-        create: users.map((user) => ({ userId: user.id, owedCents: 1500 }))
+        create: users.map((user) => ({
+          userId: user.id,
+          owedCents: 1500,
+          normalizedOwedInrCents: 1500,
+          originalOwedMinor: 1500,
+          originalCurrency: "INR"
+        }))
       }
     }
   });
