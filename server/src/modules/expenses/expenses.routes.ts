@@ -52,6 +52,9 @@ router.post(
         groupId: input.groupId,
         description: input.description,
         amountCents: input.amountCents,
+        originalAmountMinor: input.amountCents,
+        originalCurrency: "INR",
+        normalizedAmountInrCents: input.amountCents,
         paidById: input.paidById,
         splitMethod: input.splitMethod,
         expenseDate: input.expenseDate ? new Date(input.expenseDate) : new Date(),
@@ -61,6 +64,9 @@ router.post(
           create: calculated.map((split) => ({
             userId: split.userId,
             owedCents: split.owedCents,
+            normalizedOwedInrCents: split.owedCents,
+            originalOwedMinor: split.owedCents,
+            originalCurrency: "INR",
             inputAmountCents: split.amountCents ?? null,
             inputPercentage: split.percentage ?? null,
             inputShares: split.shares ?? null
@@ -121,6 +127,9 @@ router.put(
         data: {
           description: input.description,
           amountCents: input.amountCents,
+          originalAmountMinor: input.amountCents,
+          originalCurrency: "INR",
+          normalizedAmountInrCents: input.amountCents,
           paidById: input.paidById,
           splitMethod: input.splitMethod,
           expenseDate: input.expenseDate ? new Date(input.expenseDate) : existing.expenseDate,
@@ -129,6 +138,9 @@ router.put(
             create: calculated.map((split) => ({
               userId: split.userId,
               owedCents: split.owedCents,
+              normalizedOwedInrCents: split.owedCents,
+              originalOwedMinor: split.owedCents,
+              originalCurrency: "INR",
               inputAmountCents: split.amountCents ?? null,
               inputPercentage: split.percentage ?? null,
               inputShares: split.shares ?? null

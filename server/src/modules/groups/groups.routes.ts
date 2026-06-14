@@ -40,7 +40,7 @@ router.post(
         name: input.name,
         description: input.description || null,
         createdById: req.user!.id,
-        members: { create: { userId: req.user!.id } }
+        members: { create: { userId: req.user!.id, joinedAt: new Date() } }
       },
       include: { members: { include: { user: { select: { id: true, name: true, email: true } } } } }
     });
@@ -88,10 +88,10 @@ router.post(
     });
     if (!user) throw new HttpError(404, "No existing user found for that email");
 
-    await prisma.groupMember.upsert({
+    await prisma.groupMembership.upsert({
       where: { groupId_userId: { groupId: req.params.groupId, userId: user.id } },
       update: {},
-      create: { groupId: req.params.groupId, userId: user.id }
+      create: { groupId: req.params.groupId, userId: user.id, joinedAt: new Date() }
     });
 
     res.status(201).json({ member: user });
@@ -103,15 +103,15 @@ router.delete(
   asyncHandler(async (req, res) => {
     await assertGroupMember(req.params.groupId, req.user!.id);
 
-    const membership = await prisma.groupMember.findUnique({
+    const membership = await prisma.groupMembership.findUnique({
       where: { groupId_userId: { groupId: req.params.groupId, userId: req.params.userId } }
     });
     if (!membership) throw new HttpError(404, "Group member not found");
 
-    const memberCount = await prisma.groupMember.count({ where: { groupId: req.params.groupId } });
+    const memberCount = await prisma.groupMembership.count({ where: { groupId: req.params.groupId } });
     if (memberCount <= 1) throw new HttpError(400, "A group must keep at least one member");
 
-    await prisma.groupMember.delete({
+    await prisma.groupMembership.delete({
       where: { groupId_userId: { groupId: req.params.groupId, userId: req.params.userId } }
     });
 

@@ -5,10 +5,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: "#17201c",
-        mint: "#0f9f6e",
-        coral: "#de6b48",
-        cloud: "#f6f8f7"
+        ink: "rgb(var(--ink) / <alpha-value>)",
+        muted: "rgb(var(--muted) / <alpha-value>)",
+        mint: "rgb(var(--mint) / <alpha-value>)",
+        coral: "rgb(var(--coral) / <alpha-value>)",
+        cloud: "rgb(var(--cloud) / <alpha-value>)",
+        surface: "rgb(var(--surface) / <alpha-value>)",
+        elevated: "rgb(var(--elevated) / <alpha-value>)",
+        line: "rgb(var(--line) / <alpha-value>)"
       }
     }
   },

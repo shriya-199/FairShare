@@ -35,6 +35,9 @@ router.post(
         fromUserId: input.fromUserId,
         toUserId: input.toUserId,
         amountCents: input.amountCents,
+        originalAmountMinor: input.amountCents,
+        originalCurrency: "INR",
+        normalizedAmountInrCents: input.amountCents,
         note: input.note || null,
         settledAt: input.settledAt ? new Date(input.settledAt) : new Date(),
         createdById: req.user!.id

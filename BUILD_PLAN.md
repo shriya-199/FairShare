@@ -1,5 +1,44 @@
 # Build Plan
 
+## Critical Pivot
+- The assignment has changed. The app is now a shared expenses app for flatmates Aisha, Rohan, Priya, Meera, Dev, and Sam.
+- The highest-priority work is now CSV import, anomaly detection, membership date ranges, currency handling, and explainable balances.
+- Do not continue optimizing the project as a generic Splitwise clone.
+- Required final docs are `README.md`, `SCOPE.md`, `DECISIONS.md`, and `AI_USAGE.md`.
+- `expenses_export.csv` is not currently present in the workspace, so exact import mapping and actual anomaly log are blocked until the file is provided.
+
+## Pivot Implementation Plan
+- Phase 1: Inspect `expenses_export.csv` once available.
+  - Identify columns, date format, currency fields, split types, member names, settlement rows, and malformed rows.
+  - Do not edit the CSV.
+- Phase 2: Add schema support.
+  - Membership date ranges.
+  - Import batches.
+  - Raw imported rows.
+  - Import anomalies.
+  - Import report metadata.
+  - Currency code on expenses/settlements if required by the CSV.
+- Phase 3: Build CSV importer.
+  - Parse as provided.
+  - Persist raw rows.
+  - Validate rows.
+  - Detect at least 12 deliberate data problems.
+  - Continue after errors.
+  - Generate import report.
+- Phase 4: Build anomaly UI.
+  - Show row number, field, issue, severity, policy, and import status.
+  - Do not hide quarantined rows.
+- Phase 5: Adapt balances.
+  - Respect membership date ranges.
+  - Exclude/quarantine invalid rows according to documented policy.
+  - Group balances by currency if multiple currencies exist.
+  - Show explainable balance breakdown.
+- Phase 6: Update docs and deploy.
+  - Complete anomaly log in `SCOPE.md`.
+  - Complete decision log in `DECISIONS.md`.
+  - Complete AI usage corrections in `AI_USAGE.md`.
+  - Deploy public URL.
+
 ## Purpose
 Build a simplified Splitwise-style expense sharing app for friends, roommates, and small groups. The app must be realistic for a 3-day internship assignment, maintainable, deployed, and backed by a relational database.
 
@@ -226,6 +265,26 @@ prisma/
 - Added public deployment readiness checklist and smoke test.
 - Remaining external step: choose a hosting provider, provision hosted PostgreSQL, set env vars, run migrations, and publish the public URL.
 
+### Milestone 6: CSV Import And Anomaly Review
+- Status: implemented, pending validation against the real `expenses_export.csv`.
+- Implemented authenticated CSV upload flow at `/imports`.
+- Implemented backend import preview endpoint that stores the original CSV text and raw rows.
+- Implemented anomaly persistence with row number, raw row data, anomaly type, severity, explanation, suggested action, final action, and approval flag.
+- Implemented all required anomaly categories from the pivot request.
+- Implemented anomaly action UI for approve import, ignore row, marked fixed, and needs review.
+- Implemented finalize flow that imports eligible rows, skips ignored rows, blocks unresolved error rows, and stores an import report.
+- Added membership date fields and currency fields to the relational schema.
+- Verification:
+  - `pnpm exec prisma validate` passed.
+  - `pnpm exec prisma generate` passed.
+  - `pnpm test` passed.
+  - `pnpm build` passed.
+- Known limitations:
+  - Real CSV column mapping and real anomaly log cannot be finalized because `expenses_export.csv` is not present in the workspace.
+  - Inline row value editing is not implemented yet; the preview supports anomaly actions.
+  - Settlement-looking rows are detected and blocked from expense import, but settlement CSV import is not implemented yet.
+  - Multi-currency rows are stored with currency code and flagged, but no conversion is performed.
+
 ### Evaluator Readiness Review
 - Login module: complete.
 - Group management: complete.
@@ -240,6 +299,7 @@ prisma/
 - README completeness: complete after deployment and evaluator sections were added.
 - Build plan completeness: complete after progress, deployment, and evaluator readiness sections were added.
 - AI context reproducibility: complete after schema, API, frontend, deployment, testing, limitations, and prompt history were consolidated.
+- CSV import preview/report: implemented, pending validation against the real CSV.
 
 ### Phase 0: Finalize Product Rules
 - Status: complete through documented implementation assumptions in `AI_CONTEXT.md`.

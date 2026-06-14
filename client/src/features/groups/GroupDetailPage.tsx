@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
-import { MessageSquare, X } from "lucide-react";
+import { ArrowUpRight, MessageSquare, X } from "lucide-react";
 import { Button } from "../../components/Button";
 import { Panel } from "../../components/Panel";
 import { api } from "../../lib/api";
@@ -35,16 +35,26 @@ export function GroupDetailPage() {
   });
 
   if (groupQuery.isLoading) return <p>Loading group...</p>;
-  if (groupQuery.error || !groupQuery.data) return <p className="text-red-700">Unable to load group.</p>;
+  if (groupQuery.error || !groupQuery.data) return <p className="text-coral">Unable to load group.</p>;
 
   const group = groupQuery.data.group;
 
   return (
     <div className="grid gap-6">
-      <div>
-        <h1 className="text-2xl font-bold text-ink">{group.name}</h1>
-        {group.description && <p className="text-sm text-slate-600">{group.description}</p>}
-      </div>
+      <section className="glass-panel rounded-lg p-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted">Group workspace</p>
+            <h1 className="text-4xl font-bold tracking-tight text-ink">{group.name}</h1>
+            {group.description && <p className="mt-2 text-sm text-muted">{group.description}</p>}
+          </div>
+          <Link to={`/groups/${group.id}/recommendations`}>
+            <Button variant="secondary">
+              Recommendations <ArrowUpRight size={16} />
+            </Button>
+          </Link>
+        </div>
+      </section>
 
       <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
         <Panel title="Members">
@@ -52,11 +62,11 @@ export function GroupDetailPage() {
             {group.members.map((member) => (
               <div
                 key={member.user.id}
-                className="flex items-center justify-between gap-3 rounded-md bg-slate-100 px-3 py-2 text-sm"
+                className="flex items-center justify-between gap-3 rounded-md border border-line bg-elevated/60 px-3 py-2 text-sm"
               >
                 <div>
                   <p className="font-medium text-ink">{member.user.name}</p>
-                  <p className="text-xs text-slate-500">{member.user.email}</p>
+                  <p className="text-xs text-muted">{member.user.email}</p>
                 </div>
                 <Button
                   type="button"
@@ -72,11 +82,25 @@ export function GroupDetailPage() {
             ))}
           </div>
           <AddMemberForm groupId={group.id} />
-          {removeMemberMutation.error && <p className="mt-2 text-sm text-red-700">{removeMemberMutation.error.message}</p>}
+          {removeMemberMutation.error && <p className="mt-2 text-sm text-coral">{removeMemberMutation.error.message}</p>}
         </Panel>
 
         <Panel title="Group balances">
           <BalanceSummary balance={balanceQuery.data?.balance} />
+          <div className="mt-4 flex flex-wrap gap-2">
+            {group.members.map((member) => (
+              <Link key={member.user.id} to={`/groups/${group.id}/balances/${member.user.id}`}>
+                <Button type="button" variant="secondary" className="min-h-9 px-3">
+                  Explain {member.user.name}
+                </Button>
+              </Link>
+            ))}
+            <Link to={`/groups/${group.id}/recommendations`}>
+              <Button type="button" variant="secondary" className="min-h-9 px-3">
+                Settlement recommendations
+              </Button>
+            </Link>
+          </div>
         </Panel>
       </div>
 
@@ -92,18 +116,18 @@ export function GroupDetailPage() {
                 <Link
                   to={`/groups/${group.id}/expenses/${expense.id}`}
                   key={expense.id}
-                  className="rounded-md border border-slate-200 p-3 transition hover:border-mint"
+                  className="group rounded-md border border-line bg-elevated/50 p-4 transition hover:-translate-y-0.5 hover:border-mint hover:bg-surface"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="font-semibold text-ink">{expense.description}</p>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted">
                         Paid by {expense.paidBy.name} on {formatDate(expense.expenseDate)}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold">{formatMoney(expense.amountCents)}</p>
-                      <p className="inline-flex items-center gap-1 text-xs text-slate-500">
+                      <p className="inline-flex items-center gap-1 text-xs text-muted">
                         <MessageSquare size={13} /> Chat
                       </p>
                     </div>
@@ -111,7 +135,7 @@ export function GroupDetailPage() {
                 </Link>
               ))
             ) : (
-              <p className="text-sm text-slate-600">No expenses yet.</p>
+              <p className="text-sm text-muted">No expenses yet.</p>
             )}
           </div>
         </Panel>
@@ -121,20 +145,20 @@ export function GroupDetailPage() {
           <div className="mt-4 grid gap-2">
             {group.settlements?.length ? (
               group.settlements.map((settlement) => (
-                <div key={settlement.id} className="rounded-md bg-slate-50 p-3 text-sm">
+                <div key={settlement.id} className="rounded-md border border-line bg-elevated/60 p-3 text-sm">
                   <div>
                     <span className="font-semibold">{settlement.fromUser.name}</span> paid{" "}
                     <span className="font-semibold">{settlement.toUser.name}</span>{" "}
                     <span className="font-semibold text-mint">{formatMoney(settlement.amountCents)}</span>
                   </div>
-                  <div className="mt-1 text-xs text-slate-500">
+                  <div className="mt-1 text-xs text-muted">
                     {formatDate(settlement.settledAt)}
                     {settlement.note ? ` · ${settlement.note}` : ""}
                   </div>
                 </div>
               ))
             ) : (
-              <p className="mt-3 text-sm text-slate-600">No settlements recorded yet.</p>
+              <p className="mt-3 text-sm text-muted">No settlements recorded yet.</p>
             )}
           </div>
         </Panel>
