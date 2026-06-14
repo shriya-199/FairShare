@@ -193,6 +193,46 @@
   - `pnpm test` passed.
   - `pnpm build` passed.
 
+## Premium SaaS UX Redesign
+- Status: implemented.
+- Goal: make the product feel like a polished modern SaaS application suitable for a live internship demo while keeping the code simple.
+- Design references interpreted:
+  - Linear: quiet surfaces, compact navigation, fast-feeling transitions, restrained typography.
+  - Notion: clear workspace hierarchy and low-friction content scanning.
+  - Splitwise: group/balance mental model remains familiar.
+  - Ramp and Stripe Dashboard: executive summary cards, strong financial clarity, credible data-review flows.
+  - Vercel: dark/light polish, translucent shell, high-contrast primary actions.
+- UX choices:
+  - Added CSS-variable theme tokens for `ink`, `muted`, `surface`, `elevated`, `line`, `mint`, `coral`, and `cloud`.
+  - Added light/dark theme support through `document.documentElement.dataset.theme` and localStorage.
+  - Rebuilt the app shell with sticky translucent navigation, compact icon navigation, and a persistent theme toggle.
+  - Reworked the dashboard into a product-oriented command center with import/review/settle positioning and high-signal metrics.
+  - Reworked import into a "CSV import control room" with a visible three-step flow, anomaly cards, and clearer approval language.
+  - Reworked group detail into a workspace entry point with prominent recommendation access and theme-aware member/expense/settlement cards.
+  - Reworked auth into a branded focused entry screen instead of a plain form.
+  - Kept components simple: `Button`, `Panel`, and `Field` were upgraded centrally so most pages inherit the visual system.
+- Demo rationale:
+  - Interviewer can start at dashboard, click import, review anomalies, open a group, inspect member balance explanation, and finish with settlement recommendations.
+  - The visual hierarchy makes the assignment-specific features obvious without needing verbal explanation.
+  - The UI prioritizes clarity over decoration: gradients are subtle background atmosphere, data cards remain compact, and no new heavy UI framework was added.
+- Files changed:
+  - `client/src/styles.css`
+  - `client/tailwind.config.ts`
+  - `client/src/app/AppLayout.tsx`
+  - `client/src/app/ProtectedRoute.tsx`
+  - `client/src/components/Button.tsx`
+  - `client/src/components/Panel.tsx`
+  - `client/src/components/Field.tsx`
+  - `client/src/features/auth/AuthForm.tsx`
+  - `client/src/features/dashboard/DashboardPage.tsx`
+  - `client/src/features/imports/ImportPage.tsx`
+  - `client/src/features/groups/GroupDetailPage.tsx`
+  - `client/src/features/balances/BalanceSummary.tsx`
+  - `client/src/features/balances/BalanceExplanationPage.tsx`
+  - `client/src/features/balances/SettlementRecommendationsPage.tsx`
+- Verification:
+  - `pnpm build` passed after the UX redesign.
+
 ## Project
 - Assignment: reverse engineer Splitwise, scope a realistic 3-day version, and build a working deployed app.
 - Current phase: implementation started.

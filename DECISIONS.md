@@ -119,6 +119,30 @@
 - Reason: Aisha needs a clear "who pays whom" summary, and pairwise normalization is explainable within the 3-day scope.
 - Impact: `/groups/:groupId/recommendations` shows payer, receiver, and normalized INR amount.
 
+### 2026-06-14 - Premium SaaS UX Without New UI Framework
+- Decision: Redesign the existing React/Tailwind UI using shared CSS variables, upgraded primitives, and focused page composition.
+- Alternatives considered: adding a component library or doing a large frontend rewrite.
+- Reason: The submission needs to feel polished and memorable, but the assignment still values maintainability and 3-day delivery realism.
+- Impact: `Button`, `Panel`, `Field`, app shell, dashboard, import, auth, group, and balance screens now share a premium light/dark visual language without extra dependencies.
+
+### 2026-06-14 - Dashboard Becomes A Demo Command Center
+- Decision: Replace the plain CRUD-style dashboard heading with a product-oriented hero, primary import action, demo group action, and high-signal metrics.
+- Alternatives considered: keeping a simple list-first dashboard.
+- Reason: In a live interview, the evaluator should immediately understand the differentiator: messy CSV import, explainable balances, and settlement recommendations.
+- Impact: The demo can start from `/dashboard` and naturally flow into `/imports`, group detail, balance explanation, and recommendations.
+
+### 2026-06-14 - Import UI Framed As A Control Room
+- Decision: Present CSV import as a three-step control flow: upload, review, finalize.
+- Alternatives considered: leaving upload and anomaly tables as plain forms.
+- Reason: The assignment's strongest requirement is anomaly handling; the UI should make review and no-silent-guessing policy obvious.
+- Impact: The import page now highlights audit safety, row review, anomaly severity, required approvals, and report generation.
+
+### 2026-06-14 - Light/Dark Theme Uses CSS Variables
+- Decision: Use CSS variables and a small localStorage-backed toggle rather than separate themed component trees.
+- Alternatives considered: Tailwind dark variants on every component.
+- Reason: Variables keep code simple and make future style changes centralized.
+- Impact: Theme switching is smooth, shared primitives adapt automatically, and the app feels closer to modern SaaS tools like Linear, Stripe Dashboard, and Vercel.
+
 ## Reuse Decisions
 - Reuse auth module.
 - Reuse PostgreSQL/Prisma setup.
