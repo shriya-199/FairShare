@@ -131,6 +131,42 @@
 - Reason: In a live interview, the evaluator should immediately understand the differentiator: messy CSV import, explainable balances, and settlement recommendations.
 - Impact: The demo can start from `/dashboard` and naturally flow into `/imports`, group detail, balance explanation, and recommendations.
 
+### 2026-06-14 - Dashboard Prioritizes Interview Demo Flow
+- Decision: Redesign the dashboard around four summary cards, interactive balances, Aisha's who-pays-whom view, activity, and upcoming settlement suggestions.
+- Alternatives considered: adding only cosmetic styling to the existing dashboard.
+- Reason: The previous dashboard looked like a CRUD admin panel and did not foreground the assignment's strongest story.
+- Impact: The first screen now shows financial position, next actions, proof of balance logic, and demo-ready settlement guidance without requiring navigation.
+
+### 2026-06-14 - Dashboard Data Stays Client-Composed
+- Decision: Derive dashboard activity and settlement suggestions from existing group and balance endpoints.
+- Alternatives considered: adding a dedicated dashboard API.
+- Reason: The current backend already exposes enough data, and avoiding a new endpoint keeps the implementation simple and maintainable.
+- Impact: The dashboard performs extra group-detail queries after groups load, but avoids backend churn and remains acceptable for the small internship dataset.
+
+### 2026-06-14 - Group Pages Become Collaborative Workspaces
+- Decision: Redesign group detail pages around a cover header, member avatar cards, balance chips, activity timeline, group health, and floating add-expense CTA.
+- Alternatives considered: keeping panels of member/expense/settlement lists and only restyling them.
+- Reason: The assignment demo benefits when a group feels like a living workspace where expenses, membership, health, and settlement status are understandable at a glance.
+- Impact: Group pages no longer read as CRUD tables; they now emphasize collaboration, timeline context, and settlement progress while preserving existing APIs and forms.
+
+### 2026-06-14 - Group Health Is Derived Client-Side
+- Decision: Compute group health from current expenses, settlements, and open pairwise balance amount.
+- Alternatives considered: adding a backend health endpoint.
+- Reason: Existing data is enough for a clear demo indicator, and client-side derivation avoids backend changes.
+- Impact: Health labels show `Needs activity`, `Healthy`, `Improving`, or `Needs settlement` based on simple explainable rules.
+
+### 2026-06-14 - Expenses Become A Transaction Feed
+- Decision: Replace plain expense list cards with expandable transaction-feed cards showing icon, payer avatar, split badge, participants, amount, relative time, and details.
+- Alternatives considered: keeping expenses inside only the activity timeline.
+- Reason: Expenses are the core object in the assignment, and a transaction-feed pattern is more familiar, polished, and demo-friendly than a CRUD list.
+- Impact: Group pages now make expenses scannable and expandable while preserving direct navigation to expense explanations.
+
+### 2026-06-14 - Expense Detail Prioritizes Explainability
+- Decision: Rebuild expense detail around split visualization, calculation explanation, settlement impact, and chat.
+- Alternatives considered: keeping the original split table and chat panel.
+- Reason: The evaluator needs to see not only stored data, but how the app calculates and explains shared costs.
+- Impact: Each expense now shows the financial logic visually and narratively without changing backend APIs.
+
 ### 2026-06-14 - Import UI Framed As A Control Room
 - Decision: Present CSV import as a three-step control flow: upload, review, finalize.
 - Alternatives considered: leaving upload and anomaly tables as plain forms.

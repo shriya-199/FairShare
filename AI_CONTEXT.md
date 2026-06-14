@@ -233,6 +233,78 @@
 - Verification:
   - `pnpm build` passed after the UX redesign.
 
+## Dashboard Redesign
+- Status: implemented.
+- Goal: make the first authenticated screen immediately impressive in a live interview while keeping the dashboard useful and easy to explain.
+- Top section:
+  - Personalized greeting using the authenticated user's first name.
+  - Fast primary actions for CSV import and group creation.
+  - Metric cards for `You owe`, `You are owed`, `Net balance`, and `Active groups`.
+- Main area:
+  - Interactive balance overview with selectable people and animated proportional bars.
+  - Simplified `Who pays whom` section for Aisha using normalized pairwise balances.
+  - Recent activity feed derived from group expenses and settlements.
+  - Upcoming settlement suggestions derived from the same pairwise balance data.
+- Visual details:
+  - Glassmorphism cards through existing `glass-panel` styling.
+  - Hover lift, color transitions, animated bars, and compact icon interactions.
+  - Skeleton loaders for metric cards, charts, and lists.
+  - Empty states with small CSS illustration blocks rather than adding image assets or dependencies.
+- Implementation decision:
+  - Dashboard uses existing `/api/groups`, `/api/groups/:groupId`, and `/api/balances/overall` endpoints.
+  - No backend changes were needed.
+  - The activity feed is computed client-side from group detail data to keep delivery simple.
+- Files changed:
+  - `client/src/features/dashboard/DashboardPage.tsx`
+- Verification:
+  - `pnpm build` passed after the dashboard redesign.
+
+## Group Workspace Redesign
+- Status: implemented.
+- Goal: make each group feel like a collaborative workspace instead of a CRUD detail page.
+- UX changes:
+  - Replaced the basic group header with a cover-style workspace header and subtle gradient background.
+  - Added group health indicator based on expense, settlement, and open balance state.
+  - Added member avatar cards with active/left badges, joined/left date labels, and per-member net balance.
+  - Added balance chips for spent amount, open balance, member count, and settlement count.
+  - Added animated settlement status card showing whether the group is settled or has an open balance.
+  - Added simplified "who pays whom" workspace cards with avatars and recommendation access.
+  - Replaced expense/settlement lists with a timeline of activity.
+  - Added floating `Add expense` CTA that anchors to the existing expense form.
+  - Preserved existing add-member, add-expense, settlement, balance explanation, and recommendation workflows.
+- Mobile/desktop behavior:
+  - Layout uses responsive grids and stacked cards on small screens.
+  - Floating CTA remains reachable on mobile.
+  - Member, balance, and timeline cards avoid table layouts and wrap safely.
+- Files changed:
+  - `client/src/features/groups/GroupDetailPage.tsx`
+  - `client/src/features/expenses/ExpenseForm.tsx`
+  - `client/src/features/settlements/SettlementForm.tsx`
+- Verification:
+  - `pnpm build` passed after the group workspace redesign.
+
+## Expense Management Redesign
+- Status: implemented.
+- Goal: make expense management feel like a modern transaction feed with strong explainability.
+- Expense list/feed changes:
+  - Group pages now include a dedicated `Expense feed` panel.
+  - Expense cards show a category-style icon, payer avatar, split method badge, participant count, amount, relative time, and expandable details.
+  - Expanded cards show participants with owed amounts, optional notes, and a direct link to the explanation page.
+  - Cards use hover lift, glass/elevated surfaces, and native expandable details to keep code simple.
+- Expense detail changes:
+  - Rebuilt the expense detail page around an `Expense intelligence` hero.
+  - Added split visualization bars for each participant.
+  - Added calculation explanation cards for total paid, split method, and integer-cent rounding policy.
+  - Added settlement impact cards showing exactly who owes the payer because of the expense.
+  - Reworked chat into a polished side panel with empty state and polling status.
+  - Preserved edit/delete and existing chat behavior.
+- Files changed:
+  - `client/src/features/groups/GroupDetailPage.tsx`
+  - `client/src/features/expenses/ExpenseDetailPage.tsx`
+  - `client/src/features/expenses/ExpenseEditForm.tsx`
+- Verification:
+  - `pnpm build` passed after the expense redesign.
+
 ## Project
 - Assignment: reverse engineer Splitwise, scope a realistic 3-day version, and build a working deployed app.
 - Current phase: implementation started.

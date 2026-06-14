@@ -64,7 +64,7 @@ export function SettlementForm({ group }: { group: Group }) {
           <Input value={note} onChange={(event) => setNote(event.target.value)} />
         </Field>
       </div>
-      {mutation.error && <p className="text-sm text-red-700">{mutation.error.message}</p>}
+      {mutation.error && <p className="text-sm text-coral">{mutation.error.message}</p>}
       <Button type="submit" disabled={mutation.isPending || group.members.length < 2}>
         {mutation.isPending ? "Recording..." : "Record settlement"}
       </Button>

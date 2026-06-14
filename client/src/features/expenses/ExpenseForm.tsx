@@ -113,7 +113,7 @@ export function ExpenseForm({ group }: { group: Group }) {
           {group.members.map((member) => {
             const split = splits.find((item) => item.userId === member.user.id)!;
             return (
-              <div key={member.user.id} className="grid gap-2 rounded-md border border-slate-200 p-3 md:grid-cols-[1fr_auto]">
+              <div key={member.user.id} className="grid gap-2 rounded-md border border-line bg-elevated/50 p-3 md:grid-cols-[1fr_auto]">
                 <label className="flex items-center gap-2 text-sm font-medium">
                   <input
                     type="checkbox"
@@ -149,7 +149,7 @@ export function ExpenseForm({ group }: { group: Group }) {
         </div>
       </div>
 
-      {mutation.error && <p className="text-sm text-red-700">{mutation.error.message}</p>}
+      {mutation.error && <p className="text-sm text-coral">{mutation.error.message}</p>}
       <Button type="submit" disabled={mutation.isPending}>
         <Plus size={16} /> {mutation.isPending ? "Adding..." : "Add expense"}
       </Button>
