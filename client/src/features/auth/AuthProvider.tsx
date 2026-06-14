@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api, postJson } from "../../lib/api";
 import type { User } from "../../types/domain";
+import { demoUser, isDemoModeEnabled, setDemoMode, useDemoModeShortcut } from "../demo/demoMode";
 
 type AuthContextValue = {
   user: User | null;
@@ -15,12 +16,34 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  useDemoModeShortcut();
 
   useEffect(() => {
+    if (isDemoModeEnabled()) {
+      setUser(demoUser);
+      setLoading(false);
+      return;
+    }
+
     api<{ user: User }>("/api/auth/me")
       .then((data) => setUser(data.user))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    function handleDemoChange() {
+      if (isDemoModeEnabled()) {
+        setUser(demoUser);
+        setLoading(false);
+      } else {
+        setUser(null);
+        setLoading(false);
+      }
+    }
+
+    window.addEventListener("fairshare-demo-change", handleDemoChange);
+    return () => window.removeEventListener("fairshare-demo-change", handleDemoChange);
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -36,6 +59,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(data.user);
       },
       async logout() {
+        if (isDemoModeEnabled()) {
+          setDemoMode(false);
+          setUser(null);
+          return;
+        }
         await postJson<void>("/api/auth/logout", {});
         setUser(null);
       }

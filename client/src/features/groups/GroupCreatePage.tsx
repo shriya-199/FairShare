@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/Button";
 import { Field, Input, TextArea } from "../../components/Field";
 import { Panel } from "../../components/Panel";
+import { useToast } from "../../components/Toast";
 import { postJson } from "../../lib/api";
 import type { Group } from "../../types/domain";
 
@@ -12,11 +13,13 @@ export function GroupCreatePage() {
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const mutation = useMutation({
     mutationFn: () => postJson<{ group: Group }>("/api/groups", { name, description }),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: ["groups"] });
+      showToast({ tone: "success", title: "Group created", body: `${data.group.name} is ready for expenses.` });
       navigate(`/groups/${data.group.id}`);
     }
   });

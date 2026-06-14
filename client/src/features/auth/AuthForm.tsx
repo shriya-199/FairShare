@@ -2,12 +2,14 @@ import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/Button";
 import { Field, Input } from "../../components/Field";
+import { useToast } from "../../components/Toast";
 import { ApiError } from "../../lib/api";
 import { useAuth } from "./AuthProvider";
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const { login, signup } = useAuth();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,9 +23,16 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     try {
       if (mode === "signup") await signup(name, email, password);
       else await login(email, password);
+      showToast({
+        tone: "success",
+        title: mode === "signup" ? "Account created" : "Welcome back",
+        body: "Your workspace is ready."
+      });
       navigate("/dashboard");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Authentication failed");
+      const message = err instanceof ApiError ? err.message : "Authentication failed";
+      setError(message);
+      showToast({ tone: "error", title: "Authentication failed", body: message });
     } finally {
       setSubmitting(false);
     }

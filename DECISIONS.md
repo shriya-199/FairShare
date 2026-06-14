@@ -119,6 +119,12 @@
 - Reason: Aisha needs a clear "who pays whom" summary, and pairwise normalization is explainable within the 3-day scope.
 - Impact: `/groups/:groupId/recommendations` shows payer, receiver, and normalized INR amount.
 
+### 2026-06-15 - Settlement Page Prioritizes Aisha's Single Question
+- Decision: Redesign `/groups/:groupId/recommendations` to show only large who-pays-whom cards with one-click settlement recording.
+- Alternatives considered: keeping explanatory recommendation rows inside a panel or adding a full settlement form to each row.
+- Reason: Aisha's requirement is immediate clarity, so the page should answer only "who pays whom" and make recording the payment one action.
+- Impact: The page now uses minimal typography-led cards and posts recommended payments directly to `POST /api/settlements`.
+
 ### 2026-06-14 - Premium SaaS UX Without New UI Framework
 - Decision: Redesign the existing React/Tailwind UI using shared CSS variables, upgraded primitives, and focused page composition.
 - Alternatives considered: adding a component library or doing a large frontend rewrite.
@@ -166,6 +172,60 @@
 - Alternatives considered: keeping the original split table and chat panel.
 - Reason: The evaluator needs to see not only stored data, but how the app calculates and explains shared costs.
 - Impact: Each expense now shows the financial logic visually and narratively without changing backend APIs.
+
+### 2026-06-15 - CSV Import Becomes Premium Onboarding
+- Decision: Transform CSV import into a six-step onboarding flow with drag-and-drop upload, animated parsing, preview, anomaly center, user decisions, and import summary.
+- Alternatives considered: keeping the previous single-page upload plus row list.
+- Reason: The assignment's most distinctive requirement is anomaly review; making it the signature experience strengthens the live demo.
+- Impact: `/imports` now presents import as an auditable guided workflow rather than an admin utility.
+
+### 2026-06-15 - Anomaly Center Uses Side-By-Side Review
+- Decision: Show each anomaly row with original CSV data beside parsed preview data and explicit action buttons.
+- Alternatives considered: select dropdowns inside raw row cards.
+- Reason: Side-by-side comparison makes the app's no-silent-guessing policy visible and easier to defend to evaluators.
+- Impact: Users can inspect row number, severity, explanation, suggested action, and final decision in one place.
+
+### 2026-06-15 - Balance Amounts Open A Why Audit Trail
+- Decision: Turn group balance amounts into explicit `Why?` audit links and redesign the explanation page as a financial running-total ledger.
+- Alternatives considered: adding a modal on the group page or only showing raw explanation lines.
+- Reason: Rohan's requirement is traceability, so the user should see every expense, every settlement, and the running total that produces the final balance.
+- Impact: `/groups/:groupId/balances/:userId` now reads like a financial audit trail with summary metrics, chronological balance movement, contributor cards, settlement impact, and CSV row evidence.
+
+### 2026-06-15 - Running Totals Stay Client-Side
+- Decision: Calculate running totals in the frontend from chronological explanation lines returned by the backend.
+- Alternatives considered: persisting audit-line running totals or adding a second backend endpoint.
+- Reason: The backend already returns the source-of-truth movements in order; deriving running totals in the UI keeps the architecture simple for the 3-day build.
+- Impact: The audit screen is explainable without schema churn, while the backend remains responsible for authorization and source financial events.
+
+### 2026-06-15 - Demo Mode Uses Frontend Mock Responses
+- Decision: Add Demo Mode as a frontend presentation layer with realistic sample data and mock responses for the key evaluation routes.
+- Alternatives considered: requiring a seeded PostgreSQL database for the live demo or adding backend-only demo endpoints.
+- Reason: The evaluation must be reliable in a 45-minute interview, and the final assignment CSV may not be available in every environment.
+- Impact: `Ctrl + Shift + D` or the header toggle enables a demo session as Aisha with quick access to anomalies, import report, Rohan's balance audit, and Aisha's settlement recommendations while preserving normal API behavior when disabled.
+
+### 2026-06-15 - Demo Mode Does Not Replace Relational Persistence
+- Decision: Keep Demo Mode isolated from the real backend and database schema.
+- Alternatives considered: inserting demo data automatically into PostgreSQL from the browser.
+- Reason: Browser-side seeding would be unsafe and brittle; the real app still uses PostgreSQL/Prisma, while Demo Mode is only for presentation reliability.
+- Impact: Demo Mode is fast to enable and easy to disable, but production correctness still depends on migrations, seed/import flows, and the relational database.
+
+### 2026-06-15 - Framer Motion For Focused Polish
+- Decision: Use Framer Motion only for route transitions and toast entrance/exit animations.
+- Alternatives considered: CSS-only transitions or adding a larger UI animation system.
+- Reason: The app needed visible polish for evaluation, but the implementation should stay small and easy to maintain.
+- Impact: The app feels smoother and more premium, with the accepted trade-off of a larger client bundle and a Vite chunk-size warning.
+
+### 2026-06-15 - Toasts Stay Lightweight And Global
+- Decision: Add a small local `ToastProvider` instead of a third-party toast library.
+- Alternatives considered: installing a notification package or keeping inline-only success states.
+- Reason: A local provider covers the required feedback paths with minimal dependency and styling overhead.
+- Impact: Common actions now give immediate feedback while preserving the existing React Query data flow.
+
+### 2026-06-15 - Accessibility Polish Is Structural
+- Decision: Add a skip link, stronger focus-ring usage on navigation, reduced-motion CSS, and accessible toast live regions.
+- Alternatives considered: treating accessibility as only visual contrast and keyboard defaults.
+- Reason: Keyboard navigation and motion preferences matter during a live demo and improve the app's professional feel.
+- Impact: The UI is easier to navigate with keyboard and less jarring for users who prefer reduced motion.
 
 ### 2026-06-14 - Import UI Framed As A Control Room
 - Decision: Present CSV import as a three-step control flow: upload, review, finalize.

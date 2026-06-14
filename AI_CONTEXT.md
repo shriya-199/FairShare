@@ -166,7 +166,9 @@
   - This satisfies the Rohan traceability requirement.
 - Settlement recommendations:
   - API route `GET /api/balances/groups/:groupId/recommendations` returns simplified pairwise who-pays-whom recommendations.
-  - UI route `/groups/:groupId/recommendations` shows the final normalized INR payer/payee summary.
+  - UI route `/groups/:groupId/recommendations` shows only the final normalized INR payer/payee summary.
+  - The page uses large minimal cards in the form `Aisha -> Priya ₹2300`.
+  - Each recommendation has a one-click `Record paid` action that creates a settlement with the recommended payer, payee, and amount.
   - This satisfies the Aisha simplified summary requirement.
 - Membership and currency stakeholder requirements:
   - Priya: currency correction is represented by original currency fields, normalized INR fields, `CurrencyRate`, and non-INR anomaly surfacing.
@@ -304,6 +306,140 @@
   - `client/src/features/expenses/ExpenseEditForm.tsx`
 - Verification:
   - `pnpm build` passed after the expense redesign.
+
+## Premium CSV Import Onboarding
+- Status: implemented.
+- Goal: make anomaly review the signature feature of the app.
+- Flow:
+  - Step 1: drag-and-drop CSV upload with group selection.
+  - Step 2: animated parsing state while the file text is read and sent for preview.
+  - Step 3: import preview with rows, anomaly counts, and first raw rows.
+  - Step 4: anomaly detection center with severity summary.
+  - Step 5: explicit user decisions with approval/action buttons.
+  - Step 6: import summary and generated report after finalize.
+- Anomaly center UX:
+  - Severity badges for errors, warnings, and information.
+  - Row numbers and row status.
+  - Suggested actions shown in plain language.
+  - Side-by-side original CSV row and parsed preview panels.
+  - Approval buttons for approve, ignore row, mark fixed, and needs review.
+  - Color coding: coral for errors, amber for warnings, mint for information/success.
+- Implementation decision:
+  - Reuses existing import preview, anomaly action, finalize, and report APIs.
+  - Keeps the premium experience in the frontend workflow without adding backend complexity.
+- Files changed:
+  - `client/src/features/imports/ImportPage.tsx`
+- Verification:
+  - `pnpm build` passed after the import onboarding redesign.
+
+## Why Balance Audit Experience
+- Status: implemented.
+- Goal: satisfy Rohan's requirement that every balance can be traced from source rows to final net amount.
+- User entry point:
+  - Group balance cards now label balances as a `Why? balance audit`.
+  - Clicking a user's balance amount opens `/groups/:groupId/balances/:userId`.
+- Screen behavior:
+  - Shows the selected user's final normalized INR balance.
+  - Shows total expense contributors, settlement contributors, credits, and debits.
+  - Shows a chronological audit trail of every expense and settlement that affected the user.
+  - Calculates and displays a running total after each line so the final balance is reproducible.
+  - Separates expense contribution cards from settlement impact cards.
+  - Shows original CSV row evidence when the expense came from import data.
+  - Shows currency notes when the original currency was not INR, while keeping the final calculation normalized to INR.
+- Implementation decision:
+  - Reuses `GET /api/balances/groups/:groupId/explanation/:userId`.
+  - Running totals are calculated in the frontend from backend-provided chronological lines.
+  - No backend schema changes were needed because the existing explanation endpoint already returns expense, settlement, currency, and CSV row details.
+- Files changed:
+  - `client/src/features/balances/BalanceExplanationPage.tsx`
+  - `client/src/features/groups/GroupDetailPage.tsx`
+- Known limitation:
+  - Overall dashboard balances are not yet clickable to a cross-group audit trail because the current explanation endpoint is group-scoped.
+
+## Dedicated Settlement Recommendation Page
+- Status: implemented.
+- Goal: satisfy Aisha immediately with the simplest possible answer to "Who pays whom?"
+- UX decisions:
+  - The page title is only `Who pays whom`.
+  - Recommendations are rendered as large payment cards with payer, arrow, payee, and amount.
+  - Secondary explanatory text is intentionally minimized so the page is demo-friendly.
+  - Empty state clearly says everyone is settled.
+- Settlement recording:
+  - Each card has a one-click `Record paid` button.
+  - The button posts to `POST /api/settlements` with `groupId`, `fromUserId`, `toUserId`, and `amountCents` from the recommendation.
+  - On success, group detail, group balances, overall balances, and recommendations are invalidated so the recommendation disappears when the payment settles the balance.
+- Implementation decision:
+  - Reuses existing `GET /api/balances/groups/:groupId/recommendations` and `POST /api/settlements`.
+  - No backend change was needed because pairwise recommendations already map directly to settlement records.
+- Files changed:
+  - `client/src/features/balances/SettlementRecommendationsPage.tsx`
+
+## Demo Mode
+- Status: implemented.
+- Purpose: support the 45-minute live evaluation with a reliable, realistic walkthrough even when local PostgreSQL or the final assignment CSV is unavailable.
+- Enable/disable:
+  - Visible `Demo` toggle in the app header.
+  - Hidden keyboard shortcut: `Ctrl + Shift + D`.
+- Demo session:
+  - Enabling Demo Mode creates a frontend demo session as Aisha.
+  - Auth pages redirect to dashboard when Demo Mode is active.
+  - Disabling Demo Mode returns the app to normal API-backed behavior.
+- Preloaded demo data:
+  - Users: Aisha, Rohan, Priya, Meera, Dev, Sam.
+  - Group: `Indiranagar Flatmates`.
+  - Membership periods: Meera leaves after March, Sam joins mid-April, Dev is a trip guest.
+  - Expenses cover equal, unequal, percentage, and share split methods.
+  - CSV import batch includes raw rows, anomaly severities, suggested actions, decisions, and generated report.
+  - Rohan balance explanation includes expenses, settlements, CSV row evidence, and running total.
+  - Aisha settlement recommendations include one-click settlement recording.
+- Demo UI:
+  - Demo bar appears under the header when active.
+  - Quick links: CSV anomalies, balance explanations, settlement suggestions, import reports.
+  - Guided walkthrough tips explain the recommended evaluation flow.
+- Implementation decisions:
+  - `client/src/features/demo/demoMode.ts` owns demo state, sample data, keyboard shortcut, and mock API responses.
+  - `client/src/lib/api.ts` routes requests to the demo mock only when Demo Mode is enabled.
+  - The real backend remains unchanged; Demo Mode is an evaluation/presentation layer, not a replacement for relational persistence.
+- Files changed:
+  - `client/src/features/demo/demoMode.ts`
+  - `client/src/lib/api.ts`
+  - `client/src/features/auth/AuthProvider.tsx`
+  - `client/src/features/auth/LoginPage.tsx`
+  - `client/src/features/auth/SignupPage.tsx`
+  - `client/src/app/AppLayout.tsx`
+  - `client/src/features/imports/ImportPage.tsx`
+  - `README.md`
+
+## Final UX Polish Pass
+- Status: implemented.
+- Goal: make the app feel like a modern startup SaaS product without over-engineering or changing core architecture.
+- Additions:
+  - Framer Motion added to the client for smooth route transitions and toast entrance/exit animations.
+  - `ToastProvider` added for lightweight global notifications.
+  - Toasts added for login/signup, demo mode toggle, import preview, anomaly decisions, import report generation, group creation, member add, expense creation, and settlement recording.
+  - `EmptyState` shared component added for consistent illustrated empty states.
+  - App layout now wraps nested routes in animated page transitions.
+  - Added skip-to-content link and stronger focus-ring usage on navigation/quick links.
+  - Added reduced-motion CSS handling for accessibility.
+  - Improved global polish: selection color, tap highlight removal, smoother skeleton pulse, responsive main spacing.
+- Files changed:
+  - `client/package.json`
+  - `pnpm-lock.yaml`
+  - `client/src/components/Toast.tsx`
+  - `client/src/components/EmptyState.tsx`
+  - `client/src/main.tsx`
+  - `client/src/app/AppLayout.tsx`
+  - `client/src/styles.css`
+  - `client/src/features/auth/AuthForm.tsx`
+  - `client/src/features/imports/ImportPage.tsx`
+  - `client/src/features/balances/SettlementRecommendationsPage.tsx`
+  - `client/src/features/expenses/ExpenseForm.tsx`
+  - `client/src/features/groups/AddMemberForm.tsx`
+  - `client/src/features/groups/GroupCreatePage.tsx`
+  - `client/src/features/settlements/SettlementForm.tsx`
+- Trade-off:
+  - Framer Motion increased the client bundle and Vite emits a chunk-size warning.
+  - This is accepted for the internship demo because the animation layer remains simple, maintainable, and improves perceived quality.
 
 ## Project
 - Assignment: reverse engineer Splitwise, scope a realistic 3-day version, and build a working deployed app.

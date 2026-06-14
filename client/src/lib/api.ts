@@ -1,3 +1,5 @@
+import { demoApi, isDemoModeEnabled } from "../features/demo/demoMode";
+
 const baseUrl = "";
 
 export class ApiError extends Error {
@@ -10,6 +12,10 @@ export class ApiError extends Error {
 }
 
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
+  if (isDemoModeEnabled()) {
+    return demoApi<T>(path, options);
+  }
+
   const response = await fetch(`${baseUrl}${path}`, {
     ...options,
     credentials: "include",

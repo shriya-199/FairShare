@@ -2,12 +2,14 @@ import { FormEvent, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../../components/Button";
 import { Field, Input, Select } from "../../components/Field";
+import { useToast } from "../../components/Toast";
 import { postJson } from "../../lib/api";
 import { parseMoneyToCents } from "../../lib/format";
 import type { Group } from "../../types/domain";
 
 export function SettlementForm({ group }: { group: Group }) {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const [fromUserId, setFromUserId] = useState(group.members[0]?.user.id || "");
   const [toUserId, setToUserId] = useState(group.members[1]?.user.id || "");
   const [amount, setAmount] = useState("");
@@ -28,6 +30,7 @@ export function SettlementForm({ group }: { group: Group }) {
       await queryClient.invalidateQueries({ queryKey: ["group", group.id] });
       await queryClient.invalidateQueries({ queryKey: ["balances", "group", group.id] });
       await queryClient.invalidateQueries({ queryKey: ["balances", "overall"] });
+      showToast({ tone: "success", title: "Settlement recorded", body: "Open balances were refreshed." });
     }
   });
 

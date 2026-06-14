@@ -10,6 +10,7 @@ import {
   MessageSquare,
   Plus,
   ReceiptText,
+  SearchCheck,
   ShieldCheck,
   TrendingUp,
   UserMinus,
@@ -141,7 +142,7 @@ export function GroupDetailPage() {
       </Panel>
 
       <section className="grid gap-4 xl:grid-cols-[1fr_0.8fr]">
-        <Panel title="Balance chips">
+        <Panel title="Why? balance audit">
           {balance ? (
             <div className="grid gap-3 sm:grid-cols-2">
               {balance.netByUser.map((person) => (
@@ -155,10 +156,11 @@ export function GroupDetailPage() {
                       <Avatar name={person.name} />
                       <div className="min-w-0">
                         <p className="truncate font-semibold text-ink">{person.name}</p>
-                        <p className="text-xs text-muted">Tap to explain balance</p>
+                        <p className="text-xs text-muted">Click the amount to trace every rupee</p>
                       </div>
                     </div>
-                    <span className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${person.netCents >= 0 ? "bg-mint/10 text-mint" : "bg-coral/10 text-coral"}`}>
+                    <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-3 py-1 text-sm font-bold ring-1 ring-transparent transition group-hover:ring-current ${person.netCents >= 0 ? "bg-mint/10 text-mint" : "bg-coral/10 text-coral"}`}>
+                      <SearchCheck size={14} />
                       {formatMoney(person.netCents)}
                     </span>
                   </div>

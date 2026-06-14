@@ -62,6 +62,45 @@ The app stores the complete uploaded CSV text, every raw row, every anomaly, the
 
 Current limitation: `expenses_export.csv` is not present in this workspace, so the real assignment CSV mapping and final anomaly log still need to be verified once the file is added.
 
+## Demo Mode For Live Evaluation
+Demo Mode is designed for the 45-minute live evaluation. It gives the app realistic preloaded flatmate data even when the local database or final CSV file is not ready.
+
+How to enable:
+- Click the `Demo` button in the top navigation after opening the app.
+- Hidden shortcut: press `Ctrl + Shift + D` from anywhere in the app, including the login page.
+
+What Demo Mode provides:
+- A demo login session as Aisha.
+- A realistic flatmate group: Aisha, Rohan, Priya, Meera, Dev, and Sam.
+- Membership date changes: Meera moved out after March, Sam moved in mid-April, and Dev is a trip guest.
+- Demo expenses using equal, unequal, percentage, and share splits.
+- CSV anomaly preview with errors, warnings, information rows, suggested actions, and an import report.
+- Rohan's balance explanation with expense contributors, settlement contributors, and running total.
+- Aisha's simplified settlement recommendations.
+- One-click settlement recording for recommendations.
+
+Demo walkthrough:
+1. Enable Demo Mode.
+2. Open `CSV anomalies` from the demo bar and explain the no-silent-guessing import policy.
+3. Open `Balance why` and show Rohan's rupee-by-rupee running total.
+4. Open `Who pays whom` and show Aisha's simple settlement cards.
+5. Click `Record paid` on one recommendation to show one-click settlement recording.
+6. Open `Import report` from the demo bar to show the generated report summary.
+
+Demo Mode uses frontend mock responses for the key demo routes. It does not replace the real PostgreSQL-backed implementation; disabling Demo Mode returns the app to normal API/database behavior.
+
+## UX Polish
+The app includes a final SaaS-style polish layer for the live evaluation:
+
+- Smooth route transitions using Framer Motion.
+- Toast notifications for login, demo mode, import decisions, import finalization, group creation, member add, expense creation, and settlement recording.
+- Illustrated empty states and skeleton loaders for loading/empty views.
+- Keyboard-visible focus rings, a skip-to-content link, and accessible notification regions.
+- Responsive spacing and compact navigation for desktop and mobile.
+- Consistent Lucide iconography across primary actions and feature surfaces.
+
+Trade-off: Framer Motion adds bundle weight, but it keeps the animation layer simple and reliable for a 3-day build.
+
 ## Balance Explanation And Settlement Recommendations
 - Group pages include an explanation link for each member.
 - `/groups/:groupId/balances/:userId` shows every expense and settlement that contributes to that user's normalized INR balance.
