@@ -146,6 +146,33 @@ Production seeding is optional. Do not seed public production unless demo data i
 ## Deployment Instructions
 The app is designed for one Node web service connected to hosted PostgreSQL. This works on platforms such as Render, Railway, Fly.io, or similar Node hosts.
 
+### Fastest Render Deployment
+This repository includes `render.yaml` for a one-service Render deployment with managed PostgreSQL.
+
+1. Push the latest code to GitHub.
+2. Open Render.
+3. Choose `New` -> `Blueprint`.
+4. Connect the GitHub repository.
+5. Render will create:
+   - `fairshare` web service
+   - `fairshare-db` PostgreSQL database
+6. Wait for the first deploy to finish.
+7. Open the public Render URL.
+8. In Render environment variables, update `CLIENT_ORIGIN` to the exact public URL if Render assigned a different URL than `https://fairshare.onrender.com`.
+9. Redeploy after changing `CLIENT_ORIGIN`.
+
+Render commands used by the blueprint:
+
+```bash
+corepack enable && pnpm install --frozen-lockfile && pnpm run prisma:generate && pnpm run build
+```
+
+Start command:
+
+```bash
+pnpm run prisma:deploy && pnpm run start
+```
+
 1. Create a hosted PostgreSQL database.
 2. Create a Node web service from this repository.
 3. Set the production environment variables listed above.
