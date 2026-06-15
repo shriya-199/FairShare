@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { Button } from "../../components/Button";
@@ -16,6 +16,16 @@ type SplitDraft = {
   shares: string;
 };
 
+function createSplitDraft(userId: string): SplitDraft {
+  return {
+    userId,
+    selected: true,
+    amount: "",
+    percentage: "",
+    shares: "1"
+  };
+}
+
 export function ExpenseForm({ group }: { group: Group }) {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -24,15 +34,17 @@ export function ExpenseForm({ group }: { group: Group }) {
   const [paidById, setPaidById] = useState(group.members[0]?.user.id || "");
   const [splitMethod, setSplitMethod] = useState<SplitMethod>("EQUAL");
   const [notes, setNotes] = useState("");
-  const [splits, setSplits] = useState<SplitDraft[]>(
-    group.members.map((member) => ({
-      userId: member.user.id,
-      selected: true,
-      amount: "",
-      percentage: "",
-      shares: "1"
-    }))
-  );
+  const [splits, setSplits] = useState<SplitDraft[]>(group.members.map((member) => createSplitDraft(member.user.id)));
+
+  useEffect(() => {
+    const memberIds = new Set(group.members.map((member) => member.user.id));
+    setSplits((current) =>
+      group.members.map((member) => current.find((split) => split.userId === member.user.id) || createSplitDraft(member.user.id))
+    );
+    if (!memberIds.has(paidById)) {
+      setPaidById(group.members[0]?.user.id || "");
+    }
+  }, [group.members, paidById]);
 
   const selectedSplits = useMemo(() => splits.filter((split) => split.selected), [splits]);
 
@@ -114,7 +126,7 @@ export function ExpenseForm({ group }: { group: Group }) {
         <h3 className="text-sm font-semibold text-ink">Participants</h3>
         <div className="grid gap-2">
           {group.members.map((member) => {
-            const split = splits.find((item) => item.userId === member.user.id)!;
+            const split = splits.find((item) => item.userId === member.user.id) || createSplitDraft(member.user.id);
             return (
               <div key={member.user.id} className="grid gap-2 rounded-md border border-line bg-elevated/50 p-3 md:grid-cols-[1fr_auto]">
                 <label className="flex items-center gap-2 text-sm font-medium">

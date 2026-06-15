@@ -1,6 +1,6 @@
 import { demoApi, isDemoModeEnabled } from "../features/demo/demoMode";
 
-const baseUrl = "";
+const baseUrl = import.meta.env.VITE_API_URL || "";
 
 export class ApiError extends Error {
   details?: unknown;
